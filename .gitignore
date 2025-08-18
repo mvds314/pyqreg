@@ -5,6 +5,7 @@ metastore_db/
 # Byte-Compiled / Optimized / DLL Files
 __pycache__/
 *.py[cod]
+*.c
 
 # Distribution / Packaging
 *.egg
