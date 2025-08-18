@@ -1,8 +1,7 @@
 import numpy as np
-import pytest
 from scipy.stats import norm
 
-from src.pyqreg.c.stats import invnormal, normalden
+from pyqreg.c.stats import invnormal, normalden
 
 
 def test_invnormal():
