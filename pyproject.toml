@@ -1,0 +1,34 @@
+[project]
+name = "pyqreg"
+version = "0.5"
+description = "Fast implementation of the quantile regression with support for iid, robust, and cluster standard errors."
+readme = "README.rst"
+authors = [{ name = "Jay Kim", email = "mozjay0619@gmail.com" }]
+requires-python = ">=3.11"
+classifiers = [
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+urls = { Homepage = "https://github.com/mozjay0619/pyqreg" }
+
+[project.optional-dependencies]
+dev = [
+  "twine",
+  "coverage",
+  "pytest",
+  "pytest-cython",
+  "codecov",
+  "numpy",
+  "pandas",
+  "scipy",
+  "cython",
+  "patsy",
+]
+
+[build-system]
+requires = ["setuptools>=42", "wheel", "numpy", "cython"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
