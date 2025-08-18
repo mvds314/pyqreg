@@ -1,5 +1,4 @@
-from cython cimport boundscheck, cdivision, nogil, nonecheck, wraparound
-from libc.stdlib cimport free, malloc
+from cython cimport boundscheck, cdivision, wraparound
 
 import numpy as np
 

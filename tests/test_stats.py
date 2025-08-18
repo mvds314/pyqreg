@@ -2,11 +2,11 @@ import numpy as np
 import pytest
 from scipy.stats import norm
 
-from src.pyqreg.c.stats import invnormal, normalden
+from pyqreg.c.stats import invnormal, normalden
+import pyqreg.c.stats as c_stats
 
 
 def test_invnormal():
-
     assert np.isclose(norm.ppf(0.95), invnormal(0.95))
     assert np.isclose(norm.ppf(0.1), invnormal(0.1))
     assert np.isclose(norm.ppf(0.999), invnormal(0.999))
