@@ -1,10 +1,7 @@
-from cython cimport boundscheck, cdivision, nogil, nonecheck, wraparound
-
-import numpy as np
-
+# blas_lapack.pxd
+from cython cimport boundscheck, cdivision, wraparound
 cimport numpy as np
 
-ctypedef np.npy_float32 DTYPE_t
 ctypedef np.npy_float64 DOUBLE_t
 
 
