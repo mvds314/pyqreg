@@ -6,11 +6,7 @@ cimport numpy as np
 
 np.import_array()
 
-from .blas_lapack cimport _lapack_cholesky_inv, mm_dot
 from .cluster_cov cimport _psi_function
-from .mat_vec_ops cimport mv_mul
-from .matrix_opaccum cimport _get_num_groups, _matrix_opaccum
-from .stats cimport _invnormal, _normalden
 
 DTYPE = np.float64
 

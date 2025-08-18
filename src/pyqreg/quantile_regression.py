@@ -3,7 +3,7 @@ import scipy.stats as stats
 from numpy.linalg import pinv
 from scipy.stats import norm, t
 
-from .c.blas_lapack import lapack_cholesky_inv
+from .c.blas_lapack import lapack_cholesky_inv_py as lapack_cholesky_inv
 from .c.cluster_cov import psi_function
 from .c.fit_coefs import fit_coefs
 from .c.matrix_opaccum import matrix_opaccum
