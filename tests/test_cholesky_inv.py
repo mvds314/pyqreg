@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 from numpy.linalg import inv
 
-from src.pyqreg.c.blas_lapack import lapack_cholesky_inv
-from src.pyqreg.utils import rng_generator
+from pyqreg.c.blas_lapack import lapack_cholesky_inv
+from pyqreg.utils import rng_generator
 
 
 def test_cholesky_inv():
@@ -13,7 +13,7 @@ def test_cholesky_inv():
 
     A = rng.normal(size=[n, n])
     B = np.dot(A, A.transpose())
-    B = np.array(B, np.double, copy=False, order="F", ndmin=1)
+    B = np.array(B, np.double, order="F", ndmin=1)
 
     # We need to compute inv(B) since lapack inversion is inplace operation.
     assert np.all(np.isclose(inv(B), lapack_cholesky_inv(B)))
@@ -23,7 +23,7 @@ def test_cholesky_inv():
 
     A = rng.normal(size=[n, n])
     B = np.dot(A, A.transpose())
-    B = np.array(B, np.double, copy=False, order="F", ndmin=1)
+    B = np.array(B, np.double, order="F", ndmin=1)
 
     assert np.all(np.isclose(inv(B), lapack_cholesky_inv(B)))
 
@@ -32,6 +32,6 @@ def test_cholesky_inv():
 
     A = rng.normal(size=[n, n])
     B = np.dot(A, A.transpose())
-    B = np.array(B, np.double, copy=False, order="F", ndmin=1)
+    B = np.array(B, np.double, order="F", ndmin=1)
 
     assert np.all(np.isclose(inv(B), lapack_cholesky_inv(B)))

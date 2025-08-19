@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from src.pyqreg.c.matrix_opaccum import matrix_opaccum
+from pyqreg.c.matrix_opaccum import matrix_opaccum
 
 
 def test_group_matrix_opaccum_using_identity():
@@ -9,8 +9,8 @@ def test_group_matrix_opaccum_using_identity():
     X = np.arange(9 * 2).reshape(9, 2)
     e = np.arange(9).reshape(9, 1)
 
-    X = np.array(X, np.double, copy=False, order="F", ndmin=1)
-    e = np.array(e, np.double, copy=False, order="F", ndmin=1)
+    X = np.array(X, np.double, order="F", ndmin=1)
+    e = np.array(e, np.double, order="F", ndmin=1)
 
     group_array = np.asarray([0, 0, 0, 1, 1, 1, 2, 2, 2]).astype(np.int32)
 
@@ -38,8 +38,8 @@ def test_group_matrix_opaccum_using_formula():
     X = np.arange(9 * 2).reshape(9, 2)
     e = np.arange(9).reshape(9, 1)
 
-    X = np.array(X, np.double, copy=False, order="F", ndmin=1)
-    e = np.array(e, np.double, copy=False, order="F", ndmin=1)
+    X = np.array(X, np.double, order="F", ndmin=1)
+    e = np.array(e, np.double, order="F", ndmin=1)
 
     group_array = np.arange(9).astype(np.int32)
 
@@ -50,6 +50,4 @@ def test_group_matrix_opaccum_using_formula():
 
     output_array
 
-    assert np.all(
-        np.isclose(output_array, matrix_opaccum(X, group_array, e.ravel(), 9))
-    )
+    assert np.all(np.isclose(output_array, matrix_opaccum(X, group_array, e.ravel(), 9)))
