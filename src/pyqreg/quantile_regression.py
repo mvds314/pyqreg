@@ -15,10 +15,10 @@ class QuantReg:
     def __init__(self, y, X):
 
         if not X.flags["F_CONTIGUOUS"]:
-            X = np.array(X, np.double, copy=False, order="F", ndmin=1)
+            X = np.atleast_1d(np.asfortranarray(X, dtype=np.double))
 
         if not y.flags["F_CONTIGUOUS"]:
-            y = np.array(y, np.double, copy=False, order="F", ndmin=1)
+            y = np.atleast_1d(np.asfortranarray(y, dtype=np.double))
 
         self.y = y
         self.X = X
@@ -233,8 +233,8 @@ class QuantReg:
             xx = X[s]
             yy = y[s]
 
-            xx = np.array(xx, np.double, copy=False, order="F", ndmin=1)
-            yy = np.array(yy, np.double, copy=False, order="F", ndmin=1)
+            xx = np.atleast_1d(np.asfortranarray(xx, dtype=np.double))
+            yy = np.atleast_1d(np.asfortranarray(yy, dtype=np.double))
 
             first_coefs = _fit_coefs(xx, yy, q, eps)
 
@@ -274,8 +274,8 @@ class QuantReg:
                     xx = np.vstack([xx, ghib_x])
                     yy = np.r_[yy, ghib_y]
 
-                xx = np.array(xx, np.double, copy=False, order="F", ndmin=1)
-                yy = np.array(yy, np.double, copy=False, order="F", ndmin=1)
+                xx = np.atleast_1d(np.asfortranarray(xx, dtype=np.double))
+                yy = np.atleast_1d(np.asfortranarray(yy, dtype=np.double))
 
                 coefs = _fit_coefs(xx, yy, q, eps)
 
@@ -327,9 +327,9 @@ class QuantReg:
         self.y = self.y[sort_args]
         groups = groups[sort_args]
 
-        self.X = np.array(self.X, np.double, copy=False, order="F", ndmin=1)
-        self.y = np.array(self.y, np.double, copy=False, order="F", ndmin=1)
-        groups = np.array(groups, np.int32, copy=False, order="F", ndmin=1)
+        self.X = np.atleast_1d(np.asfortranarray(self.X, dtype=np.double))
+        self.y = np.atleast_1d(np.asfortranarray(self.y, dtype=np.double))
+        groups = np.atleast_1d(np.asfortranarray(groups, dtype=np.int32))
 
         G = len(np.unique(groups))
 
@@ -377,7 +377,8 @@ class QuantReg:
         B = matrix_opaccum(self.X, _groups, dens, n)
 
         # Compute Binv A Binv
-        B = np.array(B, np.double, copy=False, order="F", ndmin=1)
+        B = np.atleast_1d(np.asfortranarray(B, dtype=np.double))
+        # Note: is this correct, Binv is not stored right?
         lapack_cholesky_inv(B)
 
         return B @ A @ B
