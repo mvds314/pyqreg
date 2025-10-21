@@ -1,7 +1,9 @@
 # setup.py
-from setuptools import setup, Extension
-from Cython.Build import cythonize
+import sys
+
 import numpy
+from Cython.Build import cythonize
+from setuptools import Extension, setup
 
 extensions = [
     Extension(
@@ -10,7 +12,7 @@ extensions = [
         include_dirs=[numpy.get_include()],
         define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
         # TODO: fix type conversion warnings instead of suppressing them
-        extra_compile_args=["/wd4244"],
+        extra_compile_args=["/wd4244"] if sys.platform == "win32" else [],  # disables C4244
     ),
     Extension(
         "pyqreg.c.cluster_cov",
@@ -23,7 +25,7 @@ extensions = [
         ["src/pyqreg/c/fit_coefs.pyx"],
         include_dirs=[numpy.get_include()],
         define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
-        extra_compile_args=["/wd4244"],  # disables C4244
+        extra_compile_args=["/wd4244"] if sys.platform == "win32" else [],  # disables C4244
     ),
     Extension(
         "pyqreg.c.mat_vec_ops",
@@ -36,7 +38,7 @@ extensions = [
         ["src/pyqreg/c/matrix_opaccum.pyx"],
         include_dirs=[numpy.get_include()],
         define_macros=[("NPY_NO_DEPRECATED_API", "NPY_1_7_API_VERSION")],
-        extra_compile_args=["/wd4244"],  # disables C4244
+        extra_compile_args=["/wd4244"] if sys.platform == "win32" else [],  # disables C4244
     ),
     Extension(
         "pyqreg.c.stats",
