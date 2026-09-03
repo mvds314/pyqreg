@@ -65,3 +65,13 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.cibuildwheel]
+build = "cp311-* cp312-* cp313-*"
+# scipy is both a build and a runtime requirement, and publishes no i686 or
+# win32 wheels. musllinux and win_arm64 are skipped only to keep release
+# builds short; scipy supports both, so they can be enabled later.
+skip = "*-musllinux_* *_i686 *-win32 *-win_arm64"
+build-frontend = "build"
+test-requires = "pytest"
+test-command = "pytest {project}/tests"
