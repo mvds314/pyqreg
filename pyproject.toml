@@ -1,24 +1,51 @@
 [project]
-name = "pyqreg"
-version = "0.5"
-description = "Fast implementation of the quantile regression with support for iid, robust, and cluster standard errors."
+name = "pyqreg2"
+version = "0.5.0"
+description = "Maintained fork of pyqreg: fast quantile regression with support for iid, robust, and cluster standard errors."
 readme = "README.rst"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 authors = [{ name = "Jay Kim", email = "mozjay0619@gmail.com" }]
+maintainers = [{ name = "mvds314" }]
 requires-python = ">=3.11"
+keywords = [
+  "quantile regression",
+  "statistics",
+  "econometrics",
+  "cluster standard errors",
+]
 classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Cython",
+  "Programming Language :: Python :: 3",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
+  "Topic :: Scientific/Engineering",
 ]
-urls = { Homepage = "https://github.com/mozjay0619/pyqreg" }
+dependencies = [
+  "numpy>=1.24",
+  "scipy>=1.11",
+  "pandas>=2.0",
+  "patsy>=0.5.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/mvds314/pyqreg"
+Source = "https://github.com/mvds314/pyqreg"
+Issues = "https://github.com/mvds314/pyqreg/issues"
+"Upstream project" = "https://github.com/mozjay0619/pyqreg"
 
 [project.optional-dependencies]
+test = ["pytest", "pytest-cython", "statsmodels"]
 dev = [
   "twine",
   "coverage",
   "pytest",
   "pytest-cython",
-  "codecov",
+  "statsmodels",
   "numpy",
   "pandas",
   "scipy",
@@ -27,7 +54,13 @@ dev = [
 ]
 
 [build-system]
-requires = ["setuptools>=42", "wheel", "numpy", "scipy", "cython"]
+requires = [
+  "setuptools>=77",
+  "wheel",
+  "numpy>=2.0",
+  "scipy>=1.11",
+  "cython>=3.0",
+]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
