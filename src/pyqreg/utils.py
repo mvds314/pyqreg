@@ -1,6 +1,4 @@
 import numpy as np
-import pandas as pd
-from scipy.stats import gamma
 
 
 def rng_generator(seed=None, n=1):
@@ -19,14 +17,12 @@ def rng_generator(seed=None, n=1):
     https://numpy.org/doc/stable/reference/random/generator.html#numpy.random.Generator
     """
     if n > 1:
-
         ss = np.random.SeedSequence(seed)
         child_seeds = ss.spawn(n)
         rng_streams = [np.random.default_rng(s) for s in child_seeds]
         return rng_streams
 
     else:
-
         return np.random.default_rng(seed)
 
 

@@ -1,8 +1,7 @@
 import numpy as np
-import pytest
 from numpy.linalg import inv
-
 from pyqreg.c.blas_lapack import lapack_cholesky_inv
+
 from pyqreg.utils import rng_generator
 
 

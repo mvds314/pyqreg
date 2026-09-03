@@ -1,6 +1,4 @@
 import numpy as np
-import pytest
-
 from pyqreg.c.matrix_opaccum import matrix_opaccum
 
 
@@ -47,7 +45,5 @@ def test_group_matrix_opaccum_using_formula():
 
     for i in range(9):
         output_array += X[[i]].T @ e[[i]] @ e[[i]].T @ X[[i]]
-
-    output_array
 
     assert np.all(np.isclose(output_array, matrix_opaccum(X, group_array, e.ravel(), 9)))

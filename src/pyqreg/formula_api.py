@@ -17,14 +17,14 @@ def quantreg(formula, data, missing="drop"):
 
 class QuantRegFormulaWrapper(QuantReg):
     def __init__(self, y, X, X_names):
-        super(QuantRegFormulaWrapper, self).__init__(y, X)
+        super().__init__(y, X)
         self.X_names = X_names
 
     def fit(self, *args, **kwargs):
         """Upon invoking the fit method of QuantReg, wrap the numeric
         results in pandas Series to mimic the results of the statsmodels.
         """
-        self.res = super(QuantRegFormulaWrapper, self).fit(*args, **kwargs)
+        self.res = super().fit(*args, **kwargs)
 
         self.res.params = pd.Series(self.res.params, index=self.X_names)
         self.res.bse = pd.Series(self.res.bse, index=self.X_names)
@@ -35,7 +35,7 @@ class QuantRegFormulaWrapper(QuantReg):
 
     def conf_int(self, alpha=0.05):
         """Produce the confidence interval."""
-        conf_int = super(QuantRegFormulaWrapper, self).conf_int(alpha)
+        conf_int = super().conf_int(alpha)
 
         return pd.DataFrame(data=conf_int, index=self.X_names)
 
@@ -54,13 +54,11 @@ class QuantRegFormulaWrapper(QuantReg):
             axis=1,
         )
         summary.columns = ["coef", "std err", "t", "P>|t|", "[0.025", "0.975]"]
-        summary["coef"] = summary["coef"].apply(lambda x: float("{:.4f}".format(x)))
-        summary["std err"] = summary["std err"].apply(
-            lambda x: float("{:.3f}".format(x))
-        )
-        summary["t"] = summary["t"].apply(lambda x: float("{:.3f}".format(x)))
-        summary["P>|t|"] = summary["P>|t|"].apply(lambda x: float("{:.3f}".format(x)))
-        summary["[0.025"] = summary["[0.025"].apply(lambda x: float("{:.3f}".format(x)))
-        summary["0.975]"] = summary["0.975]"].apply(lambda x: float("{:.3f}".format(x)))
+        summary["coef"] = summary["coef"].apply(lambda x: float(f"{x:.4f}"))
+        summary["std err"] = summary["std err"].apply(lambda x: float(f"{x:.3f}"))
+        summary["t"] = summary["t"].apply(lambda x: float(f"{x:.3f}"))
+        summary["P>|t|"] = summary["P>|t|"].apply(lambda x: float(f"{x:.3f}"))
+        summary["[0.025"] = summary["[0.025"].apply(lambda x: float(f"{x:.3f}"))
+        summary["0.975]"] = summary["0.975]"].apply(lambda x: float(f"{x:.3f}"))
 
         return summary

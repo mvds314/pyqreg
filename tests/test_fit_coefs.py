@@ -1,5 +1,4 @@
 import numpy as np
-
 from pyqreg.c.fit_coefs import fit_coefs
 
 

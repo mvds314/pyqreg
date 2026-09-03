@@ -1,6 +1,6 @@
 import numpy as np
-import scipy.stats as stats
 from numpy.linalg import pinv
+from scipy import stats
 from scipy.stats import norm, t
 
 from .c.blas_lapack import lapack_cholesky_inv
@@ -35,7 +35,7 @@ class QuantReg:
         kappa_eps=1e-6,
         kernel="epa",
         bandwidth="hsheather",
-        cov_kwds=dict(),
+        cov_kwds=None,
     ):
         """Solve by interior point method (Mehrotra's predictor corrector
         algorithm). If n >= 100,000, it will use preprocessing step following
@@ -91,12 +91,9 @@ class QuantReg:
         n = len(self.X)
 
         if fit_method is None:
-
             if n >= 100000:
                 rng = rng_generator(seed)
-                self.params = self.fit_preproc_ipm(
-                    q, rng, Mm_factor, max_bad_fixup, kappa_eps
-                )
+                self.params = self.fit_preproc_ipm(q, rng, Mm_factor, max_bad_fixup, kappa_eps)
             else:
                 self.params = self.fit_ipm(q, eps)
 
@@ -105,14 +102,14 @@ class QuantReg:
 
         elif fit_method == "preproc-ipm":
             rng = rng_generator(seed)
-            self.params = self.fit_preproc_ipm(
-                q, rng, Mm_factor, max_bad_fixup, kappa_eps
-            )
+            self.params = self.fit_preproc_ipm(q, rng, Mm_factor, max_bad_fixup, kappa_eps)
 
         # Estimate covariance matrix
 
-        if cov_type == "cluster":
+        if cov_kwds is None:
+            cov_kwds = {}
 
+        if cov_type == "cluster":
             if "groups" not in cov_kwds:
                 raise ValueError(
                     'You must provide "groups" keyword value in cov_kwds if data is clustered'
@@ -122,9 +119,7 @@ class QuantReg:
 
                 if not np.issubdtype(groups.dtype, np.integer):
                     raise TypeError(
-                        "groups array must be integer type. Instead it is {}.".format(
-                            groups.dtype
-                        )
+                        f"groups array must be integer type. Instead it is {groups.dtype}."
                     )
 
                 groups = groups.astype(np.int32)
@@ -138,31 +133,22 @@ class QuantReg:
             self.bse = np.sqrt(np.diag(self.vcov))
 
         elif cov_type == "robust":
-
-            self.vcov = self.iid_robust_cov(
-                self.params, q, kernel, bandwidth, vcov="robust"
-            )
+            self.vcov = self.iid_robust_cov(self.params, q, kernel, bandwidth, vcov="robust")
             self.bse = np.sqrt(np.diag(self.vcov))
 
         elif cov_type == "iid":
-
-            self.vcov = self.iid_robust_cov(
-                self.params, q, kernel, bandwidth, vcov="iid"
-            )
+            self.vcov = self.iid_robust_cov(self.params, q, kernel, bandwidth, vcov="iid")
             self.bse = np.sqrt(np.diag(self.vcov))
 
         else:
-
             cov_type_names = ["iid", "robust", "cluster"]
-            raise Exception("cov_type must be one of " + ", ".join(cov_type_names))
+            raise ValueError("cov_type must be one of " + ", ".join(cov_type_names))
 
         # Compute two-sided p-values.
         self.tvalues = self.params / self.bse
         self.pvalues = np.empty(len(self.tvalues))
         for i, z in enumerate(np.abs(self.tvalues)):
-            self.pvalues[i] = (
-                1 - t.cdf(x=z, loc=0, scale=1, df=n - self.X.shape[1])
-            ) * 2
+            self.pvalues[i] = (1 - t.cdf(x=z, loc=0, scale=1, df=n - self.X.shape[1])) * 2
 
         self.nobs = n
 
@@ -176,12 +162,10 @@ class QuantReg:
         alpha : float
         """
         self.upb = (
-            self.params
-            + t.ppf(q=1 - alpha / 2.0, df=self.nobs - self.X.shape[1]) * self.bse
+            self.params + t.ppf(q=1 - alpha / 2.0, df=self.nobs - self.X.shape[1]) * self.bse
         )
         self.lob = (
-            self.params
-            - t.ppf(q=1 - alpha / 2.0, df=self.nobs - self.X.shape[1]) * self.bse
+            self.params - t.ppf(q=1 - alpha / 2.0, df=self.nobs - self.X.shape[1]) * self.bse
         )
 
         return np.squeeze(np.dstack([self.lob, self.upb]))
@@ -201,9 +185,7 @@ class QuantReg:
 
         return coefs
 
-    def fit_preproc_ipm(
-        self, q, rng, eps=1e-6, Mm_factor=0.8, max_bad_fixup=3, kappa_eps=1e-6
-    ):
+    def fit_preproc_ipm(self, q, rng, eps=1e-6, Mm_factor=0.8, max_bad_fixup=3, kappa_eps=1e-6):
         """Preprocessing phase as described in Portnoy and Koenker,
         Statistical Science, (1997) 279-300.
 
@@ -224,7 +206,6 @@ class QuantReg:
         not_optimal = True
 
         while not_optimal:
-
             if m < n:
                 s = rng.choice(n, m, replace=False)
             else:
@@ -256,7 +237,6 @@ class QuantReg:
             bad_fixup = 0
 
             while not_optimal & (bad_fixup < max_bad_fixup):
-
                 xx = X[~su & ~sl]
                 yy = y[~su & ~sl]
 
@@ -285,7 +265,6 @@ class QuantReg:
 
                 if any(np.r_[su_bad, sl_bad]):
                     if np.sum(sl_bad) + np.sum(su_bad) > 0.1 * M:
-
                         m = 2 * m
                         break
 
@@ -294,7 +273,6 @@ class QuantReg:
                     bad_fixup = bad_fixup + 1
 
                 else:
-
                     not_optimal = False
 
         return coefs
@@ -362,9 +340,7 @@ class QuantReg:
             )
         else:
             raise ValueError(
-                "Incorrect kappa_type {}. Please choose between median and silverman".format(
-                    kappa_type
-                )
+                f"Incorrect kappa_type {kappa_type}. Please choose between median and silverman"
             )
 
         # c^_G
@@ -408,7 +384,7 @@ class QuantReg:
         """
         kern_names = ["biw", "cos", "epa", "gau", "par"]
         if kernel not in kern_names:
-            raise Exception("kernel must be one of " + ", ".join(kern_names))
+            raise ValueError("kernel must be one of " + ", ".join(kern_names))
         else:
             kernel = kernels[kernel]
 
@@ -419,9 +395,7 @@ class QuantReg:
         elif bandwidth == "chamberlain":
             bandwidth = chamberlain
         else:
-            raise Exception(
-                "bandwidth must be in 'hsheather', 'bofinger', 'chamberlain'"
-            )
+            raise ValueError("bandwidth must be in 'hsheather', 'bofinger', 'chamberlain'")
 
         # Compute residuals
         resid = self.y - self.X @ beta
@@ -488,7 +462,6 @@ def _fit_coefs(X, y, q, eps):
     coefs = fit_coefs(X, y, q, eps)
 
     while any(np.isnan(coefs)):
-
         eps *= 5.0
         coefs = fit_coefs(X, y, q, eps)
 

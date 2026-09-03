@@ -66,6 +66,19 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.ruff]
+line-length = 99
+# Cython sources are not Python and cannot be parsed by ruff.
+extend-exclude = ["build"]
+
+[tool.ruff.lint]
+# Pinned explicitly: ruff's default rule set changes between releases, which
+# would otherwise turn CI red without any change to this repository.
+select = ["E4", "E7", "E9", "F", "I", "UP", "B", "C4", "TRY", "PLR0402"]
+# TRY003 forbids long messages outside exception classes, which would mean
+# inventing an exception type per validation message.
+ignore = ["TRY003"]
+
 [tool.cibuildwheel]
 build = "cp311-* cp312-* cp313-*"
 # scipy is both a build and a runtime requirement, and publishes no i686 or
