@@ -2,9 +2,9 @@
 
 |CICD| |VERSION| |LICENCE| |PythonVersion| |Black|
 
-.. |CICD| image:: https://github.com/mvds314/pyqreg/actions/workflows/test.yml/badge.svg
-	:alt: Tests
-	:target: https://github.com/mvds314/pyqreg/actions/workflows/test.yml
+.. |CICD| image:: https://github.com/mvds314/pyqreg/actions/workflows/ci.yml/badge.svg
+	:alt: CI
+	:target: https://github.com/mvds314/pyqreg/actions/workflows/ci.yml
 .. |LICENCE| image:: https://img.shields.io/pypi/l/pyqreg2?label=license
 	:alt: PyPI - License
 .. |VERSION| image:: https://img.shields.io/pypi/v/pyqreg2?color=success&label=pypi%20version
