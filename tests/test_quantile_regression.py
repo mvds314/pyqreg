@@ -24,3 +24,15 @@ def test_every_advertised_kernel_matches_statsmodels(kernel):
     expected = sm.QuantReg(y, X).fit(q=0.5, kernel=kernel, bandwidth="hsheather").bse
 
     np.testing.assert_allclose(bse, np.asarray(expected), rtol=1e-5)
+
+
+def test_unknown_fit_method_is_rejected():
+    """An unrecognised fit_method must be reported, not silently skipped.
+
+    Without validation the coefficient step is skipped entirely and the failure
+    surfaces later as a confusing AttributeError on self.params.
+    """
+    y, X = make_data()
+
+    with pytest.raises(ValueError, match="fit_method"):
+        QuantReg(y, X).fit(0.5, fit_method="ipmm")

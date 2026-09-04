@@ -104,6 +104,10 @@ class QuantReg:
             rng = rng_generator(seed)
             self.params = self.fit_preproc_ipm(q, rng, Mm_factor, max_bad_fixup, kappa_eps)
 
+        else:
+            fit_method_names = ["ipm", "preproc-ipm"]
+            raise ValueError("fit_method must be None or one of " + ", ".join(fit_method_names))
+
         # Estimate covariance matrix
 
         if cov_kwds is None:
