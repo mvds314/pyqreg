@@ -2,21 +2,44 @@
 
 |CICD| |VERSION| |LICENCE| |PythonVersion| |Black|
 
-.. |CICD| image:: https://img.shields.io/circleci/build/github/mozjay0619/pyqreg?label=circleci&token=93f5878e444e751d779f2954eb5fce9bc9ab5b3e   
-	:alt: CircleCI
-.. |LICENCE| image:: https://img.shields.io/pypi/l/pyqreg?label=liscence   
+.. |CICD| image:: https://github.com/mvds314/pyqreg/actions/workflows/ci.yml/badge.svg
+	:alt: CI
+	:target: https://github.com/mvds314/pyqreg/actions/workflows/ci.yml
+.. |LICENCE| image:: https://img.shields.io/pypi/l/pyqreg2?label=license
 	:alt: PyPI - License
-.. |VERSION| image:: https://img.shields.io/pypi/v/pyqreg?color=success&label=pypi%20version
+.. |VERSION| image:: https://img.shields.io/pypi/v/pyqreg2?color=success&label=pypi%20version
 	:alt: PyPI
-.. |PythonVersion| image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
-.. _PythonVersion: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
+.. |PythonVersion| image:: https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue
+	:alt: Python versions
 .. |Black| image:: https://img.shields.io/badge/code%20style-black-000000.svg
-.. _Black: https://github.com/psf/black
+	:alt: Code style: black
+	:target: https://github.com/psf/black
 
 Pyqreg
 ======
 
 Pyqreg implements the quantile regression algorithm with fast estimation method using the linear programming interior point method following the preprocessing procedure in Portnoy and Koenker (1997). It provides methods for estimating the asymptotic covariance matrix for i.i.d and heteroskedastic errors, as well as clustered errors following Parente and Silva (2013).
+
+About this fork
+---------------
+
+This is a maintained fork of `mozjay0619/pyqreg <https://github.com/mozjay0619/pyqreg>`_, which is no longer receiving updates. It adds support for recent Python, NumPy and SciPy versions.
+
+It is distributed on PyPI as **pyqreg2**, but the import name is still ``pyqreg``, so it is a drop-in replacement:
+
+.. code::
+
+	pip install pyqreg2
+
+.. code:: python
+
+	import pyqreg  # unchanged
+
+.. warning::
+
+	Do not install ``pyqreg`` and ``pyqreg2`` at the same time. Both provide the same ``pyqreg`` import package, so installing one on top of the other will overwrite its files. Run ``pip uninstall pyqreg`` before installing ``pyqreg2``.
+
+All credit for the original implementation goes to Jay Kim. This fork keeps the original BSD 3-Clause license.
 
 References
 ----------
@@ -27,16 +50,16 @@ References
 Install
 -------
 
-pyqreg pre-install requirements are:
+pyqreg2 requires:
 
-* Python >= 3.6
-* Numpy
+* Python >= 3.11
+* NumPy, SciPy, pandas and patsy (installed automatically)
 
 You can install the latest release with:
 
-.. code:: python
+.. code::
 
-	pip3 install pyqreg
+	pip install pyqreg2
 
 Example
 -------
@@ -50,7 +73,7 @@ We replicate the study in `statsmodels quantile regression <https://www.statsmod
 	data = sm.datasets.engel.load_pandas().data
 	data.head()
 
-.. figure:: https://github.com/mozjay0619/pyqreg/blob/master/media/img1.png
+.. figure:: https://raw.githubusercontent.com/mvds314/pyqreg/master/media/img1.png
 
 Let's first fit the quantile regression model using the statsmodels.
 
@@ -61,7 +84,7 @@ Let's first fit the quantile regression model using the statsmodels.
 	res = mod.fit(q=0.5)
 	res.summary()
 
-.. figure:: https://github.com/mozjay0619/pyqreg/blob/master/media/img6.png
+.. figure:: https://raw.githubusercontent.com/mvds314/pyqreg/master/media/img6.png
 
 Now instead of using statsmodels quantile regression, we use that of pyqreg. Observe that the results are identical to that of statsmodels.
 
@@ -72,7 +95,7 @@ Now instead of using statsmodels quantile regression, we use that of pyqreg. Obs
 	res = mod.fit(q=0.5)
 	res.summary()
 
-.. figure:: https://github.com/mozjay0619/pyqreg/blob/master/media/img2.png
+.. figure:: https://raw.githubusercontent.com/mvds314/pyqreg/master/media/img2.png
 
 The remaining parts of the study can be found in this notebook.
 
@@ -82,7 +105,7 @@ Speed comparisons
 
 Despite the identical regression results and similar APIs, pyqreg uses completely different optimization algorithm under the hood, making it anywhere between 10 to 30 times faster than the statsmodels quantile regression, depending on the data size, error distribution and quantile.
 
-.. figure:: https://github.com/mozjay0619/pyqreg/blob/master/media/img5.png
+.. figure:: https://raw.githubusercontent.com/mvds314/pyqreg/master/media/img5.png
 
 The above plots the median time to convergence for each data size, which shows a large and growing difference in absolute speed with data size. 
 

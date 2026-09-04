@@ -67,6 +67,7 @@ nosetests.xml
 
 # Extension modules
 *.so
+*.pyd
 
 # Notes
 notes.txt
