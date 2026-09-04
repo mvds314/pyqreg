@@ -432,6 +432,7 @@ kernels = {}
 kernels['biw'] = lambda u: 15. / 16 * (1 - u**2)**2 * np.where(np.abs(u) <= 1, 1, 0)
 kernels['cos'] = lambda u: np.where(np.abs(u) <= .5, 1 + np.cos(2 * np.pi * u), 0)
 kernels['epa'] = lambda u: 3. / 4 * (1-u**2) * np.where(np.abs(u) <= 1, 1, 0)
+kernels['gau'] = lambda u: norm.pdf(u)
 kernels['par'] = _parzen
 
 
