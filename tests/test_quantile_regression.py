@@ -3,7 +3,7 @@ import threading
 import numpy as np
 import pytest
 import statsmodels.api as sm
-from pyqreg import QuantReg
+from pyqreg import QuantReg, quantile_regression
 
 
 def make_data(n=600, seed=7):
@@ -97,3 +97,21 @@ def test_rank_deficient_design_is_reported_instead_of_silently_mishandled(seed):
 
     with pytest.raises(np.linalg.LinAlgError):
         call_with_timeout(lambda: QuantReg(y, X).fit(0.5))
+
+
+def test_solver_that_never_converges_gives_up_instead_of_looping_forever(monkeypatch):
+    """The duality gap retry loop must terminate.
+
+    Only the C solver is replaced, so the real retry logic runs. Widening the
+    tolerance cannot rescue every NaN, and an unbounded loop turns a failed fit
+    into a hang with no diagnostic.
+    """
+    y, X = make_data(n=100)
+
+    def never_converges(X_input, y_input, tau, eps):
+        return np.full(X_input.shape[1], np.nan)
+
+    monkeypatch.setattr(quantile_regression, "fit_coefs", never_converges)
+
+    with pytest.raises(np.linalg.LinAlgError):
+        call_with_timeout(lambda: QuantReg(y, X).fit(0.5), timeout=10)

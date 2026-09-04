@@ -474,6 +474,10 @@ def chamberlain(n, q, alpha=.05):
 # fmt: on
 
 
+# Number of times _fit_coefs relaxes the duality gap tolerance before giving up.
+_MAX_EPS_RELAXATIONS = 10
+
+
 def _fit_coefs(X, y, q, eps):
     """In cases of convergence issues, we increase the duality gap
     tolerance.
@@ -489,8 +493,18 @@ def _fit_coefs(X, y, q, eps):
 
     coefs = fit_coefs(X, y, q, eps)
 
-    while any(np.isnan(coefs)):
+    for _ in range(_MAX_EPS_RELAXATIONS):
+        if not np.any(np.isnan(coefs)):
+            return coefs
+
         eps *= 5.0
         coefs = fit_coefs(X, y, q, eps)
+
+    if np.any(np.isnan(coefs)):
+        raise np.linalg.LinAlgError(
+            "the interior point method did not converge: the coefficients are still "
+            f"NaN after relaxing the duality gap tolerance {_MAX_EPS_RELAXATIONS} times, "
+            f"up to {eps:g}."
+        )
 
     return coefs
