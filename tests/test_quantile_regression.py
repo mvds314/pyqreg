@@ -3,6 +3,7 @@ import threading
 import numpy as np
 import pytest
 import statsmodels.api as sm
+
 from pyqreg import QuantReg, quantile_regression
 
 
@@ -115,3 +116,32 @@ def test_solver_that_never_converges_gives_up_instead_of_looping_forever(monkeyp
 
     with pytest.raises(np.linalg.LinAlgError):
         call_with_timeout(lambda: QuantReg(y, X).fit(0.5), timeout=10)
+
+
+def make_clustered_data(n_groups=40, group_size=25, seed=5):
+    rng = np.random.default_rng(seed)
+    n = n_groups * group_size
+    groups = np.repeat(np.arange(n_groups), group_size)
+    shock = rng.normal(0, 3, size=n_groups)[groups]
+    X = np.asfortranarray(np.column_stack([np.ones(n), rng.normal(size=n)]))
+    y = np.asfortranarray(X @ np.array([1.0, 2.0]) + shock + rng.normal(size=n))
+    return y, X, groups.astype(np.int32)
+
+
+def test_cluster_cov_does_not_depend_on_the_order_of_the_rows():
+    """Clustered standard errors are a sum over clusters, so row order is irrelevant.
+
+    The accumulator requires rows of a cluster to be contiguous, which makes
+    this invariant depend on cluster_cov sorting its inputs first.
+    """
+    y, X, groups = make_clustered_data()
+    expected = QuantReg(y, X).fit(0.5, cov_type="cluster", cov_kwds={"groups": groups}).bse
+
+    shuffle = np.random.default_rng(0).permutation(len(y))
+    bse = (
+        QuantReg(np.asfortranarray(y[shuffle]), np.asfortranarray(X[shuffle]))
+        .fit(0.5, cov_type="cluster", cov_kwds={"groups": groups[shuffle]})
+        .bse
+    )
+
+    np.testing.assert_allclose(bse, expected, rtol=1e-8)
