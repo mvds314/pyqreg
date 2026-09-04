@@ -8,7 +8,7 @@ https://web.archive.org/web/20151030215621/http://home.online.no/~pjacklam/notes
 """
 
 from cython cimport boundscheck, cdivision, nogil, nonecheck, wraparound
-from libc.math cimport erfc, exp, log, pi, sqrt
+from libc.math cimport INFINITY, NAN, erfc, exp, log, pi, sqrt
 
 import numpy as np
 
@@ -64,6 +64,17 @@ cdef double _invnormal(double p):
     cdef double x
     cdef double q, r, u, e
     
+    # None of the branches below assigns x outside the open unit interval, so
+    # these cases must return before x is read.
+    if (p != p) | (p < 0.0) | (p > 1.0):
+        return NAN
+
+    if p == 0.0:
+        return -INFINITY
+
+    if p == 1.0:
+        return INFINITY
+
     if ((0.0 < p) & (p < P_LOW)):
         q = sqrt(-2.0*log(p))
         x = (((((C1*q+C2)*q+C3)*q+C4)*q+C5)*q+C6) / ((((D1*q+D2)*q+D3)*q+D4)*q+1)
