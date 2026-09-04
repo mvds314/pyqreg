@@ -93,7 +93,14 @@ class QuantReg:
         if fit_method is None:
             if n >= 100000:
                 rng = rng_generator(seed)
-                self.params = self.fit_preproc_ipm(q, rng, Mm_factor, max_bad_fixup, kappa_eps)
+                self.params = self.fit_preproc_ipm(
+                    q,
+                    rng,
+                    eps=eps,
+                    Mm_factor=Mm_factor,
+                    max_bad_fixup=max_bad_fixup,
+                    kappa_eps=kappa_eps,
+                )
             else:
                 self.params = self.fit_ipm(q, eps)
 
@@ -102,7 +109,14 @@ class QuantReg:
 
         elif fit_method == "preproc-ipm":
             rng = rng_generator(seed)
-            self.params = self.fit_preproc_ipm(q, rng, Mm_factor, max_bad_fixup, kappa_eps)
+            self.params = self.fit_preproc_ipm(
+                q,
+                rng,
+                eps=eps,
+                Mm_factor=Mm_factor,
+                max_bad_fixup=max_bad_fixup,
+                kappa_eps=kappa_eps,
+            )
 
         else:
             fit_method_names = ["ipm", "preproc-ipm"]
