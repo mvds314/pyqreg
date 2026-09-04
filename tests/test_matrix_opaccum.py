@@ -1,5 +1,35 @@
 import numpy as np
+import pytest
 from pyqreg.c.matrix_opaccum import matrix_opaccum
+
+
+def test_unsorted_groups_are_rejected():
+    """Interleaved group labels must not be accepted silently.
+
+    The accumulator walks the rows once and starts a new group whenever the
+    label changes, so interleaved labels split one cluster into many and return
+    a different matrix than the sum over clusters.
+    """
+    X = np.array(np.arange(12 * 2).reshape(12, 2), np.double, order="F")
+    e = np.array(np.arange(12), np.double, order="F")
+    group_array = np.array([0, 1] * 6, dtype=np.int32)
+
+    with pytest.raises(ValueError, match="sorted"):
+        matrix_opaccum(X, group_array, e, 2)
+
+
+def test_group_count_smaller_than_the_number_of_groups_is_rejected():
+    """G must cover every group present in the data.
+
+    Group boundaries are written into a buffer of exactly G ints, so a G below
+    the number of groups writes past the end of that allocation.
+    """
+    X = np.array(np.arange(9 * 2).reshape(9, 2), np.double, order="F")
+    e = np.array(np.arange(9), np.double, order="F")
+    group_array = np.asarray([0, 0, 0, 1, 1, 1, 2, 2, 2]).astype(np.int32)
+
+    with pytest.raises(ValueError, match="G"):
+        matrix_opaccum(X, group_array, e, 2)
 
 
 def test_group_matrix_opaccum_using_identity():

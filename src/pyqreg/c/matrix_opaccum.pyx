@@ -63,6 +63,24 @@ cdef void get_group_counts(int* group_counts, int* group, int n, int G):
 @boundscheck(False)  
 @wraparound(False)
 @cdivision(True)
+cdef int _count_sorted_groups(int* group, int n):
+    """Return the number of groups, or -1 if the labels are not sorted."""
+    
+    cdef int i, G = 1
+    
+    for i in range(1, n):
+        
+        if group[i] < group[i-1]:
+            return -1
+        
+        elif group[i] != group[i-1]:
+            G += 1
+    
+    return G
+
+@boundscheck(False)  
+@wraparound(False)
+@cdivision(True)
 cdef void _matrix_opaccum(double* varlist,
                           double* opvar,
                           int* group,
@@ -141,6 +159,23 @@ def matrix_opaccum(np.ndarray[DOUBLE_t, ndim=2] _varlist,
     cdef int p = _varlist.shape[1]
 
     cdef int* group = <int*>(np.PyArray_DATA(_group))
+
+    if _group.shape[0] != n or _opvar.shape[0] != n:
+        raise ValueError("group and opvar must have one entry per row of varlist")
+
+    cdef int n_groups = _count_sorted_groups(group, n)
+
+    if n_groups < 0:
+        raise ValueError(
+            "group must be sorted: rows of the same group have to be contiguous, "
+            "otherwise a group is split into several blocks"
+        )
+
+    if n_groups > G:
+        raise ValueError(
+            f"G is {G} but group contains {n_groups} groups. G must not be smaller "
+            "than the number of groups."
+        )
     
     cdef double* varlist = <double*>(np.PyArray_DATA(_varlist))
     cdef double* opvar = <double*>(np.PyArray_DATA(_opvar))
