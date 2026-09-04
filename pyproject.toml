@@ -86,5 +86,8 @@ build = "cp311-* cp312-* cp313-*"
 # builds short; scipy supports both, so they can be enabled later.
 skip = "*-musllinux_* *_i686 *-win32 *-win_arm64"
 build-frontend = "build"
-test-requires = "pytest"
+# statsmodels is the reference implementation the covariance estimators were
+# ported from, and the tests use it as an independent oracle, so the wheel test
+# environment needs it too. Without it pytest fails collection with exit code 2.
+test-requires = "pytest statsmodels"
 test-command = "pytest {project}/tests"
