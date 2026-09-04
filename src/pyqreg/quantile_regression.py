@@ -478,6 +478,15 @@ def _fit_coefs(X, y, q, eps):
     """In cases of convergence issues, we increase the duality gap
     tolerance.
     """
+    rank = np.linalg.matrix_rank(X)
+
+    if rank < X.shape[1]:
+        raise np.linalg.LinAlgError(
+            f"design matrix is rank deficient: rank {rank} < {X.shape[1]} columns. "
+            "The Cholesky factorization of X'X is not defined for a singular X'X. "
+            "Drop the collinear columns before fitting."
+        )
+
     coefs = fit_coefs(X, y, q, eps)
 
     while any(np.isnan(coefs)):

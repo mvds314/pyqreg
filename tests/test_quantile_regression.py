@@ -1,3 +1,5 @@
+import threading
+
 import numpy as np
 import pytest
 import statsmodels.api as sm
@@ -9,6 +11,30 @@ def make_data(n=600, seed=7):
     X = np.asfortranarray(np.column_stack([np.ones(n), rng.normal(size=n)]))
     y = np.asfortranarray(X @ np.array([1.0, 2.0]) + rng.normal(size=n))
     return y, X
+
+
+def call_with_timeout(func, timeout=30):
+    """Run func on a daemon thread so a non-terminating call fails the test.
+
+    A plain call would hang the whole session instead of reporting a failure.
+    """
+    outcome = {}
+
+    def target():
+        try:
+            outcome["value"] = func()
+        except BaseException as exc:  # noqa: BLE001 - re-raised on the caller's thread
+            outcome["error"] = exc
+
+    thread = threading.Thread(target=target, daemon=True)
+    thread.start()
+    thread.join(timeout)
+
+    if thread.is_alive():
+        raise TimeoutError(f"call did not return within {timeout}s")
+    if "error" in outcome:
+        raise outcome["error"]
+    return outcome["value"]
 
 
 @pytest.mark.parametrize("kernel", ["biw", "cos", "epa", "gau", "par"])
@@ -52,3 +78,22 @@ def test_preproc_ipm_solves_to_the_same_optimum_as_plain_ipm():
     params = QuantReg(y, X).fit(0.5, fit_method="preproc-ipm", seed=1).params
 
     np.testing.assert_allclose(params, expected, atol=1e-5)
+
+
+@pytest.mark.parametrize("seed", [0, 2])
+def test_rank_deficient_design_is_reported_instead_of_silently_mishandled(seed):
+    """A collinear design must fail fast rather than spin or return garbage.
+
+    The Cholesky factorisation of a singular X'X is meaningless: depending on
+    the data it either yields NaN coefficients, which the unbounded retry loop
+    then chases forever with an ever larger duality gap, or coefficients of
+    order 1e12 that are silently returned as an estimate.
+    """
+    rng = np.random.default_rng(seed)
+    n = 500
+    x = rng.normal(size=n)
+    X = np.asfortranarray(np.column_stack([np.ones(n), x, 2 * x]))
+    y = np.asfortranarray(x + rng.normal(size=n))
+
+    with pytest.raises(np.linalg.LinAlgError):
+        call_with_timeout(lambda: QuantReg(y, X).fit(0.5))
