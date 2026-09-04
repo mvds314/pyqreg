@@ -1,6 +1,6 @@
 [project]
 name = "pyqreg2"
-version = "0.5.0"
+version = "0.5.1"
 description = "Maintained fork of pyqreg: fast quantile regression with support for iid, robust, and cluster standard errors."
 readme = "README.rst"
 license = "BSD-3-Clause"
